@@ -1,0 +1,89 @@
+﻿@model List<Products>
+@{
+    int PageIndex = (int)ViewData["PageIndex"]!;
+    int TotalPages = (int)ViewData["TotalPages"]!;
+    string Search = (string)ViewData["Search"]!;
+    string Column = (string)ViewData["Column"]!;
+    string OrderBy = (string)ViewData["OrderBy"]!;
+}
+<h2 class="text-center mb-5">List of Products</h2>
+
+<div class="row mb-2">
+    <div class="col ">
+        <a asp-action="create" class="btn btn-success" asp-controller="Product">Add Product</a>
+    </div>
+    <div class="col">
+        <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" name="Search" placeholder="Search" value="@Search" aria-label="Search" />
+            <button class="btn-solid btn-icon theme-secondary" type="submit">
+            Search
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function SortTable(column) {
+        let orderBy = "desc";
+        let currentColumn = "@Column";
+        let currentOrder = "@OrderBy";
+        
+        if(column===currentColumn)
+        {
+            if(currentOrder=="asc")
+            {
+                orderBy="desc";
+            }
+            else orderBy="asc";
+        }
+
+        window.location.href = "?search=@(Search)&column=" + column + "&orderBy=" + orderBy;
+    }
+</script>
+
+<table class="table table-bordered">
+    <thead>
+        <th style="cursor:pointer" onclick="SortTable('Id')">Id</th>
+        <th style="cursor:pointer" onclick="SortTable('Name')">Name</th>
+        <th style="cursor:pointer" onclick="SortTable('Brand')">Brand</th>
+        <th style="cursor:pointer" onclick="SortTable('Category')">Category</th>
+        <th style="cursor:pointer" onclick="SortTable('Price')">Price</th>
+        <th>Image</th>
+        <th style="cursor:pointer" onclick="SortTable('CreatedAt')">CreatedAt</th>
+        <th>Action</th>
+    </thead>
+    <tbody>
+        @foreach(var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Brand</td>
+                <td>@product.Category</td>
+                <td>@product.Price</td>
+                <td>
+                    <img src="/products/@product.ImageFileName" alt="/products/@product.ImageFileName" width="100" />
+                </td>
+                <td>@product.CreatedAt.ToString("MM/dd/yyyy")</td>
+                <td>
+                    <a asp-action="Edit" class="btn btn-primary" asp-route-id="@product.Id" asp-controller="Product">Edit</a>
+                    <a asp-action="Delete" class="btn btn-danger" asp-route-id="@product.Id" asp-controller="Product">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        @for(var i=1;i<=TotalPages;i++)
+        {
+            string active = "";
+            if (i == PageIndex)
+                active = "active";
+            <li class="page-item @(i == PageIndex ? "active" : "")">
+            <a class="page-link" asp-route-Search="@Search" asp-route-PageIndex="@i" asp-route-column="@Column" asp-route-orderBy="@OrderBy">@i</a>
+        </li>
+        }
+    </ul>
+</nav>
